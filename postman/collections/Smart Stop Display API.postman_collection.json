@@ -1,0 +1,592 @@
+{
+  "info": {
+    "_postman_id": "f419a924-51b9-4876-a36e-7657f918647d",
+    "name": "Smart Stop Display API",
+    "description": "API collection for the FHNW Smart Stop Display project. This collection contains endpoints for the Swiss Public Transport API (transport.opendata.ch) used to fetch public transport data for display on ESP32-based LCD screens.\n\n**Base URL:** `http://transport.opendata.ch/v1/`\n\n**Rate Limiting:** Requests are constrained by the rate limit of timetable.search.ch.\n\n**Use Cases:**\n\n- Search for stations and locations\n    \n- Get connections between two stations\n    \n- Display departure/arrival boards for specific stations",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Locations",
+      "item": [
+        {
+          "name": "Search Locations by Name",
+          "id": "d4aa7e04-ff0e-44bf-a115-097baecede8c",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://transport.opendata.ch/v1/locations?query=Basel&type=station",
+              "protocol": "http",
+              "host": [
+                "transport",
+                "opendata",
+                "ch"
+              ],
+              "path": [
+                "v1",
+                "locations"
+              ],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "Basel",
+                  "description": "Location name to search for"
+                },
+                {
+                  "key": "type",
+                  "value": "station",
+                  "description": "Type of location: all, station, poi, address"
+                }
+              ]
+            },
+            "description": "Search for locations by name. Returns matching stations, points of interest, or addresses based on the query string."
+          },
+          "response": []
+        },
+        {
+          "name": "Search Locations by Coordinates",
+          "id": "5de6dfe3-83e5-472f-a113-01c5ce4203ea",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://transport.opendata.ch/v1/locations?x=47.547408&y=7.589547&type=station",
+              "protocol": "http",
+              "host": [
+                "transport",
+                "opendata",
+                "ch"
+              ],
+              "path": [
+                "v1",
+                "locations"
+              ],
+              "query": [
+                {
+                  "key": "x",
+                  "value": "47.547408",
+                  "description": "Latitude coordinate (WGS84)"
+                },
+                {
+                  "key": "y",
+                  "value": "7.589547",
+                  "description": "Longitude coordinate (WGS84)"
+                },
+                {
+                  "key": "type",
+                  "value": "station",
+                  "description": "Type of location: all, station, poi, address"
+                }
+              ]
+            },
+            "description": "Find nearby locations using GPS coordinates. Useful for finding the closest station to a given position."
+          },
+          "response": []
+        }
+      ],
+      "id": "1e9c2759-8149-4440-a406-f217db666d56",
+      "description": "Endpoints for searching and finding transport locations, stations, and addresses in Switzerland."
+    },
+    {
+      "name": "Connections",
+      "item": [
+        {
+          "name": "Get Connections",
+          "id": "0679e848-bf00-4238-9e53-8a4c4a412917",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://transport.opendata.ch/v1/connections?from=Lausanne&to=Genève&limit=4",
+              "protocol": "http",
+              "host": [
+                "transport",
+                "opendata",
+                "ch"
+              ],
+              "path": [
+                "v1",
+                "connections"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "Lausanne",
+                  "description": "Departure station name or ID"
+                },
+                {
+                  "key": "to",
+                  "value": "Genève",
+                  "description": "Arrival station name or ID"
+                },
+                {
+                  "key": "limit",
+                  "value": "4",
+                  "description": "Number of connections to return (1-16)"
+                }
+              ]
+            },
+            "description": "Get the next connections from a departure location to an arrival location. Returns journey details including departure/arrival times and duration."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Connections with Date/Time",
+          "id": "a4f526a4-b9a0-4830-89df-055b33ea3b55",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://transport.opendata.ch/v1/connections?from=Zürich&to=Bern&date=2025-01-30&time=08:00&limit=4",
+              "protocol": "http",
+              "host": [
+                "transport",
+                "opendata",
+                "ch"
+              ],
+              "path": [
+                "v1",
+                "connections"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "Zürich",
+                  "description": "Departure station name or ID"
+                },
+                {
+                  "key": "to",
+                  "value": "Bern",
+                  "description": "Arrival station name or ID"
+                },
+                {
+                  "key": "date",
+                  "value": "2025-01-30",
+                  "description": "Date of connection (YYYY-MM-DD)"
+                },
+                {
+                  "key": "time",
+                  "value": "08:00",
+                  "description": "Time of connection (hh:mm)"
+                },
+                {
+                  "key": "limit",
+                  "value": "4",
+                  "description": "Number of connections to return (1-16)"
+                }
+              ]
+            },
+            "description": "Get connections for a specific date and time. Useful for planning future journeys."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Connections with Via Station",
+          "id": "6a7bc604-d1d3-4ae0-a9a9-89f6c9e1194d",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://transport.opendata.ch/v1/connections?from=Basel&to=Lugano&via=Zürich&limit=4",
+              "protocol": "http",
+              "host": [
+                "transport",
+                "opendata",
+                "ch"
+              ],
+              "path": [
+                "v1",
+                "connections"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "Basel",
+                  "description": "Departure station name or ID"
+                },
+                {
+                  "key": "to",
+                  "value": "Lugano",
+                  "description": "Arrival station name or ID"
+                },
+                {
+                  "key": "via",
+                  "value": "Zürich",
+                  "description": "Via station (up to 5 allowed)"
+                },
+                {
+                  "key": "limit",
+                  "value": "4",
+                  "description": "Number of connections to return (1-16)"
+                }
+              ]
+            },
+            "description": "Get connections that pass through a specific intermediate station."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Connections by Transport Type",
+          "id": "eb539871-35b8-485f-a962-6f8029698779",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://transport.opendata.ch/v1/connections?from=Zürich&to=Bern&transportations[]=train&limit=4",
+              "protocol": "http",
+              "host": [
+                "transport",
+                "opendata",
+                "ch"
+              ],
+              "path": [
+                "v1",
+                "connections"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "Zürich",
+                  "description": "Departure station name or ID"
+                },
+                {
+                  "key": "to",
+                  "value": "Bern",
+                  "description": "Arrival station name or ID"
+                },
+                {
+                  "key": "transportations[]",
+                  "value": "train",
+                  "description": "Transport type: train, tram, ship, bus, cableway"
+                },
+                {
+                  "key": "limit",
+                  "value": "4",
+                  "description": "Number of connections to return (1-16)"
+                }
+              ]
+            },
+            "description": "Filter connections by transportation type (train, tram, ship, bus, cableway)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Departure Time Only (Smart Display)",
+          "id": "10e7d155-2983-4b28-afa4-003b37857a7f",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://transport.opendata.ch/v1/connections?from=Surinam&to=Badischer Bahnhof&limit=1&fields[]=connections/from/departure",
+              "protocol": "http",
+              "host": [
+                "transport",
+                "opendata",
+                "ch"
+              ],
+              "path": [
+                "v1",
+                "connections"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "Surinam",
+                  "description": "Departure station name"
+                },
+                {
+                  "key": "to",
+                  "value": "Badischer Bahnhof",
+                  "description": "Arrival station name"
+                },
+                {
+                  "key": "limit",
+                  "value": "1",
+                  "description": "Return only the next connection"
+                },
+                {
+                  "key": "fields[]",
+                  "value": "connections/from/departure",
+                  "description": "Limit response to departure time only"
+                }
+              ]
+            },
+            "description": "Optimized request for the Smart Stop Display - returns only the next departure time. Uses the fields parameter to minimize response size for embedded devices."
+          },
+          "response": []
+        }
+      ],
+      "id": "7b48d4e9-49bc-4dd7-b8a3-d37def5587f6",
+      "description": "Endpoints for finding connections between two locations, including departure times, arrival times, and journey details."
+    },
+    {
+      "name": "Stationboard",
+      "item": [
+        {
+          "name": "Get Departures by Station Name",
+          "id": "d3b61e70-adc1-4405-b0a7-ecb35933d307",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://transport.opendata.ch/v1/stationboard?station=Aarau&limit=10",
+              "protocol": "http",
+              "host": [
+                "transport",
+                "opendata",
+                "ch"
+              ],
+              "path": [
+                "v1",
+                "stationboard"
+              ],
+              "query": [
+                {
+                  "key": "station",
+                  "value": "Aarau",
+                  "description": "Station name to get departures for"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of departures to return"
+                }
+              ]
+            },
+            "description": "Get the next departures from a specific station. Returns departure times, destinations, and transport categories."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Departures by Station ID",
+          "id": "a0709e4d-209f-4929-9391-fd3b1ff0b17c",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://transport.opendata.ch/v1/stationboard?id=8502996&limit=10",
+              "protocol": "http",
+              "host": [
+                "transport",
+                "opendata",
+                "ch"
+              ],
+              "path": [
+                "v1",
+                "stationboard"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "8502996",
+                  "description": "Station ID (alternative to station name)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of departures to return"
+                }
+              ]
+            },
+            "description": "Get departures using the station ID instead of name. More precise when station names are ambiguous."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Arrivals",
+          "id": "eab47711-c883-4984-94ba-67ed127ed29e",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://transport.opendata.ch/v1/stationboard?station=Basel SBB&type=arrival&limit=10",
+              "protocol": "http",
+              "host": [
+                "transport",
+                "opendata",
+                "ch"
+              ],
+              "path": [
+                "v1",
+                "stationboard"
+              ],
+              "query": [
+                {
+                  "key": "station",
+                  "value": "Basel SBB",
+                  "description": "Station name"
+                },
+                {
+                  "key": "type",
+                  "value": "arrival",
+                  "description": "Type: departure (default) or arrival"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of arrivals to return"
+                }
+              ]
+            },
+            "description": "Get the next arrivals at a specific station instead of departures."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Departures by Transport Type",
+          "id": "5a81271f-e205-4757-beae-99f653304368",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://transport.opendata.ch/v1/stationboard?station=Zürich HB&transportations[]=tram&transportations[]=bus&limit=10",
+              "protocol": "http",
+              "host": [
+                "transport",
+                "opendata",
+                "ch"
+              ],
+              "path": [
+                "v1",
+                "stationboard"
+              ],
+              "query": [
+                {
+                  "key": "station",
+                  "value": "Zürich HB",
+                  "description": "Station name"
+                },
+                {
+                  "key": "transportations[]",
+                  "value": "tram",
+                  "description": "Filter by tram"
+                },
+                {
+                  "key": "transportations[]",
+                  "value": "bus",
+                  "description": "Filter by bus"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of departures to return"
+                }
+              ]
+            },
+            "description": "Filter stationboard by transportation type. Useful for showing only specific transport modes."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Departures at Specific Time",
+          "id": "b2b4660a-2967-4336-8b15-9c9cd6046ee6",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://transport.opendata.ch/v1/stationboard?station=Bern&datetime=2025-01-30 08:00&limit=10",
+              "protocol": "http",
+              "host": [
+                "transport",
+                "opendata",
+                "ch"
+              ],
+              "path": [
+                "v1",
+                "stationboard"
+              ],
+              "query": [
+                {
+                  "key": "station",
+                  "value": "Bern",
+                  "description": "Station name"
+                },
+                {
+                  "key": "datetime",
+                  "value": "2025-01-30 08:00",
+                  "description": "Date and time (YYYY-MM-DD hh:mm)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of departures to return"
+                }
+              ]
+            },
+            "description": "Get departures starting from a specific date and time."
+          },
+          "response": []
+        }
+      ],
+      "id": "05e047ce-e016-4057-8146-c5a65acec3bb",
+      "description": "Endpoints for getting departure and arrival boards for specific stations - ideal for the Smart Stop Display use case."
+    },
+    {
+      "name": "Get data",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "id": "b463c5c9-5f29-4a87-a2df-cef20bcdc9b9",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        },
+        "description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+      },
+      "response": []
+    },
+    {
+      "name": "Get DepartureTime",
+      "id": "3773cd20-ad57-4091-8828-9f8b04335e7f",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://transport.opendata.ch/v1/connections?from=Surinam&to=badischer bahnhof&limit=1&fields[]=connections/from/departure",
+          "protocol": "http",
+          "host": [
+            "transport",
+            "opendata",
+            "ch"
+          ],
+          "path": [
+            "v1",
+            "connections"
+          ],
+          "query": [
+            {
+              "key": "from",
+              "value": "Surinam"
+            },
+            {
+              "key": "to",
+              "value": "badischer bahnhof"
+            },
+            {
+              "key": "limit",
+              "value": "1"
+            },
+            {
+              "key": "fields[]",
+              "value": "connections/from/departure"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

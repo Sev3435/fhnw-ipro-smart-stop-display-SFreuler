@@ -1,0 +1,48 @@
+
+Privates Worklog
+
+Struktur
+
+Datum
+
+ - Zusammenfassung des Tages / tasks done
+
+ - Herausforderungen
+
+ - Design entscheidungen / implementierung
+
+ - Was hat funktioniert / was nicht?
+
+12.01
+
+Habe am Einfuehfungstag teilgenommen. Keine grossen Projektfortschritte.
+Von Thomas habe ich einen Scetch bekommen, wie die Architektur aussehen
+koennte in den verschiedenen Phasen des Projekts.
+
+Projektziele konnte ich schon hauptsaechlich von meinem Formular, welches ich
+eingereicht habe, uebernehmen.
+
+13.01
+
+Die definierung des Gantt-Charts.
+Das Setup der Dokumente war eher minimal. Ich habe alles in einen Ordner in
+mein Persoenliches OneDrive gelegt und die Dokumente darin erstellt, welche
+ich vorraussichtlich brauchen werden. 
+
+
+Herausforderung: viele Tasks vordefinieren, braucht wahrscheinlich noch
+Anpassung waehrend das Projekt durchgefuert wird
+
+Design entscheidung: Habe mich fuer excel entschieden, da es fuer mich am
+einfachsten ist, und es schon vordefinierte Template gibt.
+
+13.01
+Habe mir den Vorschlag von Thomas angeschaut und darauf aufgebaut. Habe es
+auch besser visualisiert durch Draw.io und Titel in technischer Dokumentation erfasst.
+
+14.01
+Habe nochmals das draw.io überarbeitet
+
+
+
+
