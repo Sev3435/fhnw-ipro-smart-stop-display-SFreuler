@@ -24,7 +24,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-.pio/
+
 
 # Unit test / coverage reports
 htmlcov/
@@ -72,3 +72,8 @@ venv.bak/
 *.zip
 *.tar.gz
 *.rar
+
+#PlatformIO
+.pio/
+.cmake-build-debug/
+compile_commands.json
