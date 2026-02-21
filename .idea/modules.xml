@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/fhnw-ipro-smart-stop-display-SFreuler.iml" filepath="$PROJECT_DIR$/.idea/fhnw-ipro-smart-stop-display-SFreuler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/fhnw_ipro_smart_stop_display_SFreuler.iml" filepath="$PROJECT_DIR$/.idea/fhnw_ipro_smart_stop_display_SFreuler.iml" />
     </modules>
   </component>
 </project>
