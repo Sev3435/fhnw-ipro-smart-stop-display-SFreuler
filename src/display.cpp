@@ -1,5 +1,5 @@
 #include <Wire.h>
-#include <rgb_lcd.h>
+#include "rgb_lcd.h"
 
 rgb_lcd lcd;
 

@@ -5,13 +5,15 @@ Struktur
 
 Datum
 
- - Zusammenfassung des Tages / tasks done
+ - tasks done
 
  - Herausforderungen
 
  - Design entscheidungen / implementierung
 
  - Was hat funktioniert / was nicht?
+
+ -
 
 12.01
 
@@ -43,6 +45,8 @@ auch besser visualisiert durch Draw.io und Titel in technischer Dokumentation er
 14.01
 Habe nochmals das draw.io überarbeitet
 
+26.02
+Wieso von arduino IDE zu CLion + PlatformIO? bessere projektstruktur, versioncontrol
 
-
+wie? https://esp32s3.com/getting-started.html#:~:text=UM%20FeatherS3.-,PlatformIO,-PlatformIO%20support%20is
 

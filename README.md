@@ -26,9 +26,9 @@ https://esp32s3.com/feathers3.html
 
 
 
-## "AI" tools
+## AI tools
 
-If you use [prompts](prompts), save them, e.g. for code [based on](https://github.com/fhnw-imvs/fhnw-ipro-indoor-climate/blob/main/level-1/Python/csv_write/csv_write.py#L2) a [prompt](https://github.com/fhnw-imvs/fhnw-ipro-indoor-climate/blob/main/prompts/2025-08-29T09-45-00Z.txt).
+https://chatgpt.com/g/g-p-69754f194c0081919a00ac923cd94c22-ipro/project
 
 ## Support
 
