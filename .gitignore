@@ -9,6 +9,7 @@
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+include/secrets.h
 
 # AWS User-specific
 .idea/**/aws.xml
