@@ -46,7 +46,21 @@ auch besser visualisiert durch Draw.io und Titel in technischer Dokumentation er
 Habe nochmals das draw.io überarbeitet
 
 26.02
-Wieso von arduino IDE zu CLion + PlatformIO? bessere projektstruktur, versioncontrol
+Wieso von arduino IDE zu CLion + PlatformIO? 
+-> bessere projektstruktur, versioncontrol mit GIT direkt aus der IDE
 
 wie? https://esp32s3.com/getting-started.html#:~:text=UM%20FeatherS3.-,PlatformIO,-PlatformIO%20support%20is
+
+30.07
+WLAN-Verbindung: Entscheidung für ein nicht blockierendes Design. „WifiManager_update()“ wird von „loop()“ aufgerufen und überprüft bei jedem Durchlauf „WiFi.status()“; 
+Wiederverbindungsversuche laufen mit einem 5-Sekunden-Timer („millis()“). 
+Grund: Das Display muss auch bei ausgefallenem WLAN weiter aktualisiert werden, und das Gerät muss sich bei Routerausfällen zur Laufzeit ohne Neustart erholen können (eine blockierende Verbindung in „setup()“ stellt nur einmal eine Verbindung her).
+Die Anmeldedaten wurden in die Datei „include/secrets.h“ verschoben, die nun in die .gitignore-Datei aufgenommen wurde, zusammen mit einer festgeschriebenen Beispielvorlage.
+
+Implementierung der WLAN-Verbindung
+**WifiManager_update()** wird von **loop()** aufgerufen und prüft bei jedem Durchlauf **WiFi.status()**. Durchläufe sind mit Methode **millis()** definiert.
+Grund: Das Display soll bei ausgefallenem WLAN weiter akutalisiert weden und das Gerät muss sich bei Routerausfällen ohne neustart erholen können.
+Die Anmeldedaten werden in **include/secrets.h** definiert. Vorlage ist unter **include/secrets.example.h** zu finden.
+
+
 
