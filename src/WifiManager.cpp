@@ -1,13 +1,9 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include "project.h"
+#include "WifiManager.h"
 #include "secrets.h"
 
-static const uint32_t RETRY_INTERVAL_MS = 30000;
-static uint32_t lastAttemptMs = 0;
-static bool wasConnected = false;
-
-void WifiManager_init() {
+void WifiManager::init() {
     WiFi.mode(WIFI_STA);
     WiFi.setSleep(false);
     WiFi.setMinSecurity(WIFI_AUTH_WPA2_PSK);
@@ -18,7 +14,7 @@ void WifiManager_init() {
     lastAttemptMs = millis();
 }
 
-void WifiManager_update() {
+void WifiManager::update() {
     bool isConnected = (WiFi.status() == WL_CONNECTED);
 
     if (isConnected && !wasConnected) {

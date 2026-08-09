@@ -1,5 +1,9 @@
-#include "project.h"
+#include "Display.h"
+#include "WifiManager.h"
 #include <Arduino.h>
+
+Display display;
+WifiManager wifiManager;
 
 void setup() {
     Serial.begin(115200);
@@ -7,11 +11,11 @@ void setup() {
     while (!Serial && millis() < 3000) {}
 #endif
     log_i("boot");
-    display_init();
-    WifiManager_init();
+    display.init();
+    wifiManager.init();
 }
 
 void loop() {
-    display_update();
-    WifiManager_update();
+    display.update();
+    wifiManager.update();
 }
