@@ -45,8 +45,8 @@ Departure TransportClient::parse(const String& body) {
     JsonDocument filter;
     filter["stationboard"][0]["number"] = true;
     filter["stationboard"][0]["to"] = true;
-    filter["stationbaord"][0]["stop"]["departure"] = true;
-    filter["stationbaord"][0]["passList"][0]["station"]["name"] = true;
+    filter["stationboard"][0]["stop"]["departure"] = true;
+    filter["stationboard"][0]["passList"][0]["station"]["name"] = true;
 
     JsonDocument doc;
     DeserializationError err = deserializeJson(doc, body);
