@@ -4,9 +4,10 @@
 #include <Arduino.h>
 #include "Config.h"
 #include <cstdint>
+#include "TimeService.h"
 
 struct Departure {
-    String time;
+    time_t departsAt = 0;
     String line;
     String destination;
     bool valid = false;
@@ -21,6 +22,7 @@ class TransportClient {
         Departure parse(const String& body);
         Config* config = nullptr;
         uint32_t lastFetchMs = 0;
+        TimeService timeService;
 };
 
 
