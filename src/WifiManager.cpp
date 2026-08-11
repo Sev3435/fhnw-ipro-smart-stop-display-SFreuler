@@ -19,6 +19,8 @@ void WifiManager::update() {
 
     if (isConnected && !wasConnected) {
         log_i("connected, IP: %s", WiFi.localIP().toString().c_str());
+        configTime(0, 0, "pool.ntp.org");
+        log_i("ntp sync started");
     }
     if (!isConnected && wasConnected) {
         log_w("connection lost");
