@@ -3,6 +3,7 @@
 #include <HTTPClient.h>
 #include <WiFi.h>
 #include <ArduinoJson.h>
+#include "TimeService.h"
 
 void TransportClient::update() {
     if (WiFi.status() != WL_CONNECTED) return;
@@ -15,7 +16,13 @@ void TransportClient::update() {
     Departure departure = parse(body);
     if (!departure.valid) return;
 
-    log_i("line %s to %s at %s", departure.line.c_str(), departure.destination.c_str(), departure.time.c_str());
+    if (!timeService.isSynced()) {
+        log_w("Time not synced yet");
+        return;
+    }
+
+    int minutes = timeService.minutesUntilDeparture(departure.departsAt);
+    log_i("line %s to %s in %d min", departure.line.c_str(), departure.destination.c_str(), minutes);
 }
 
 bool TransportClient::fetch(String& body) {
@@ -39,6 +46,24 @@ bool TransportClient::fetch(String& body) {
     return true;
 }
 
+static time_t parseIsoToDepartureTime(const char* departureIso) {
+    struct tm timeField = {};
+    strptime(departureIso, "%Y-%m-%dT%H:%M:%S", &timeField);
+    time_t departureTime = mktime(&timeField);
+
+    const char* offset = strchr(departureIso, 'T') + 9;
+    char sign = offset[0];
+    int hours = 0;
+    int minutes = 0;
+    sscanf(offset + 1, "%2d%2d", &hours, &minutes);
+    int shift = hours * 3600 + minutes * 60;
+
+    if (sign == '+') departureTime -= shift;
+    else departureTime += shift;
+
+    return departureTime;
+}
+
 Departure TransportClient::parse(const String& body) {
     Departure departure;
 
@@ -49,7 +74,7 @@ Departure TransportClient::parse(const String& body) {
     filter["stationboard"][0]["passList"][0]["station"]["name"] = true;
 
     JsonDocument doc;
-    DeserializationError err = deserializeJson(doc, body);
+    DeserializationError err = deserializeJson(doc, body, DeserializationOption::Filter(filter));
     if (err) { log_w("json: %s", err.c_str()); return departure; }
 
     for (JsonObject obj : doc["stationboard"].as<JsonArray>()) {
@@ -71,15 +96,17 @@ Departure TransportClient::parse(const String& body) {
             continue;
         }
 
-        String iso = departureIso;
-        departure.time = iso.substring(iso.indexOf('T')+ 1, iso.indexOf('T') + 6);
+        departure.departsAt = parseIsoToDepartureTime(departureIso);
         departure.line = number;
         departure.destination =(const char*)obj["to"];
         departure.valid = true;
+
+        if (departure.departsAt - time(nullptr) < 60) continue;
+        
         return departure;
     }
 
-    log_w("no departure matched line %s / nextStop %s", config->line.c_str(), config->nextStop.c_str());
+    log_w("no departure matched line %s / next stop %s", config->line.c_str(), config->nextStop.c_str());
     return departure;
 }
 
