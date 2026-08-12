@@ -7,15 +7,14 @@ void Display::init() {
     lcd.setRGB(COLOR_R, COLOR_G, COLOR_B);
     
     lcd.print("Next Departure:");
+    showDeparture("searching...");
 }
 
-void Display::update() {
-
-    if (millis() - lastRefreshMs < REFRESH_INTERVAL_MS) {
-        return;
-    }
-    lastRefreshMs = millis();
-
+void Display::showDeparture(const String& next) {
+    if (next == lastShown) return;
+    lastShown = next;
     lcd.setCursor(0, 1);
-
+    lcd.print("                ");
+    lcd.setCursor(0, 1);
+    lcd.print(next);
 }

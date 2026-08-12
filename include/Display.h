@@ -14,6 +14,7 @@ class Display {
         uint32_t lastRefreshMs = 0;
         static const uint32_t REFRESH_INTERVAL_MS = 1000;
         static const int COLOR_R = 64, COLOR_G = 224, COLOR_B = 208;
+        String lastShown;
 };
 
 #endif //FHNW_IPRO_SMART_STOP_DISPLAY_SFREULER_DISPLAY_H

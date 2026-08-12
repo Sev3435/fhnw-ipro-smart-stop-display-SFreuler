@@ -5,6 +5,7 @@
 #include "Config.h"
 #include <cstdint>
 #include "TimeService.h"
+#include "Display.h"
 
 struct Departure {
     time_t departsAt = 0;
@@ -15,12 +16,13 @@ struct Departure {
 
 class TransportClient {
     public:
-        void begin(Config* cfg) { config = cfg; }
+        void begin(Config* cfg, Display* disp) { config = cfg; display = disp; }
         void update();
     private:
         bool fetch(String& body);
         Departure parse(const String& body);
         Config* config = nullptr;
+        Display* display = nullptr;
         uint32_t lastFetchMs = 0;
         TimeService timeService;
 };

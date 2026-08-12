@@ -23,6 +23,9 @@ void TransportClient::update() {
 
     int minutes = timeService.minutesUntilDeparture(departure.departsAt);
     log_i("line %s to %s in %d min", departure.line.c_str(), departure.destination.c_str(), minutes);
+    char buf[17];
+    snprintf(buf, sizeof(buf), "Line %-4s%3d min", departure.line.c_str(), minutes);
+    display->showDeparture(buf);
 }
 
 bool TransportClient::fetch(String& body) {

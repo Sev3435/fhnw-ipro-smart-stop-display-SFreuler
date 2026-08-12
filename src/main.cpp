@@ -19,11 +19,10 @@ void setup() {
     config.load();
     display.init();
     wifiManager.init();
-    transport.begin(&config);
+    transport.begin(&config, &display);
 }
 
 void loop() {
-    display.update();
     wifiManager.update();
     transport.update();
 }
