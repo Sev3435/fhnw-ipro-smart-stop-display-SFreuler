@@ -5,6 +5,7 @@
 
 void WifiManager::init() {
     WiFi.mode(WIFI_STA);
+    WiFi.setAutoReconnect(false);
     WiFi.setSleep(false);
     WiFi.setMinSecurity(WIFI_AUTH_WPA2_PSK);
     WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info) {
@@ -27,9 +28,13 @@ void WifiManager::update() {
         lastAttemptMs = millis();
     }
 
+    // plain reconnect doesn't always recover, so tear the whole thing down and start over
     if (!isConnected && millis() - lastAttemptMs >= RETRY_INTERVAL_MS) {
-        log_d("retry nudge");
-        WiFi.reconnect();
+        log_d("retry: full re-begin");
+        WiFi.disconnect(true, true);
+        WiFi.mode(WIFI_OFF);
+        WiFi.mode(WIFI_STA);
+        WiFi.begin(WIFI_SSID, WIFI_PASS);
         lastAttemptMs = millis();
     }
 
