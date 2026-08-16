@@ -1,14 +1,16 @@
-#include "Display.h"
-#include "WifiManager.h"
-#include "Config.h"
 #include <Arduino.h>
 
 #include "TransportClient.h"
+#include "Display.h"
+#include "WifiManager.h"
+#include "Config.h"
+#include "LightSensor.h"
 
 Display display;
 WifiManager wifiManager;
 Config config;
 TransportClient transport;
+LightSensor lightSensor;
 
 void setup() {
     Serial.begin(115200);
@@ -25,4 +27,7 @@ void setup() {
 void loop() {
     wifiManager.update();
     transport.update();
+    if (lightSensor.update()) {
+        display.setBrightness(lightSensor.brightness());
+    }
 }
