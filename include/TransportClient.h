@@ -24,6 +24,7 @@ class TransportClient {
         Config* config = nullptr;
         Display* display = nullptr;
         uint32_t lastFetchMs = 0;
+        bool wasConnected = false;
         TimeService timeService;
 };
 

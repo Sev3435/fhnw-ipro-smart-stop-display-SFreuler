@@ -6,7 +6,16 @@
 #include "TimeService.h"
 
 void TransportClient::update() {
-    if (WiFi.status() != WL_CONNECTED) return;
+    bool isConnected = (WiFi.status() == WL_CONNECTED);
+    if (!isConnected) {
+        wasConnected = false;
+        return;
+    }
+    if (!wasConnected) {
+        lastFetchMs = 0; // ESP came back online, fetch right away
+        wasConnected = true;
+    }
+
     uint32_t millisSinceBoot = millis();
     if (lastFetchMs != 0 && millisSinceBoot - lastFetchMs < config->refreshSec * 1000UL) return;
     lastFetchMs = millisSinceBoot;
@@ -23,9 +32,14 @@ void TransportClient::update() {
 
     int minutes = timeService.minutesUntilDeparture(departure.departsAt);
     log_i("line %s to %s in %d min", departure.line.c_str(), departure.destination.c_str(), minutes);
-    char buf[17];
-    snprintf(buf, sizeof(buf), "Line %-4s%3d min", departure.line.c_str(), minutes);
-    display->showDeparture(buf);
+    char buffer[17];
+    if (minutes < 60) {
+        snprintf(buffer, sizeof(buffer), "Line %-4s%3d min", departure.line.c_str(), minutes);
+    } else {
+        snprintf(buffer, sizeof(buffer), "Line %-4s%dh %02dm",
+                 departure.line.c_str(), minutes / 60, minutes % 60);
+    }
+    display->showDeparture(buffer);
 }
 
 bool TransportClient::fetch(String& body) {
@@ -49,24 +63,27 @@ bool TransportClient::fetch(String& body) {
     return true;
 }
 
+// TODO: extract into new class
 static time_t parseIsoToDepartureTime(const char* departureIso) {
     struct tm timeField = {};
     strptime(departureIso, "%Y-%m-%dT%H:%M:%S", &timeField);
     time_t departureTime = mktime(&timeField);
 
-    const char* offset = strchr(departureIso, 'T') + 9;
+    const char* offset = strchr(departureIso, 'T') + 9;  // jump past T + HH:MM:SS
     char sign = offset[0];
     int hours = 0;
     int minutes = 0;
     sscanf(offset + 1, "%2d%2d", &hours, &minutes);
     int shift = hours * 3600 + minutes * 60;
 
+    // mktime gave us UTC-as-if-local; back out the offset to get real UTC
     if (sign == '+') departureTime -= shift;
     else departureTime += shift;
 
     return departureTime;
 }
 
+// TODO: extract into new class
 Departure TransportClient::parse(const String& body) {
     Departure departure;
 
@@ -87,7 +104,7 @@ Departure TransportClient::parse(const String& body) {
             continue;
         }
 
-        const char* next = obj["passList"][1]["station"]["name"];
+        const char* next = obj["passList"][1]["station"]["name"]; // [0] is current stop defined in config, [1] is the next
         if (!next || config->nextStop != next) {
             log_d("skip: nextStop '%s' != '%s'", next ? next : "(null)", config->nextStop.c_str());
             continue;
@@ -104,7 +121,7 @@ Departure TransportClient::parse(const String& body) {
         departure.destination =(const char*)obj["to"];
         departure.valid = true;
 
-        if (departure.departsAt - time(nullptr) < 60) continue;
+        if (departure.departsAt - time(nullptr) < 60) continue; // leaving too soon, grab the next one
         
         return departure;
     }
