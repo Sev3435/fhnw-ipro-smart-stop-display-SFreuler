@@ -5,12 +5,14 @@
 #include "WifiManager.h"
 #include "Config.h"
 #include "LightSensor.h"
+#include "WebServer.h"
 
 Display display;
 WifiManager wifiManager;
 Config config;
 TransportClient transport;
 LightSensor lightSensor;
+WebServer webServer;
 
 void setup() {
     Serial.begin(115200);
@@ -21,6 +23,7 @@ void setup() {
     config.load();
     display.init();
     wifiManager.init();
+    webServer.begin();
     transport.begin(&config, &display);
 }
 
