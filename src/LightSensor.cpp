@@ -26,7 +26,7 @@ bool LightSensor::update() {
 
     float brightnessFactor = rawToBrightness((int)smoothedRaw, DARK_THRESHOLD_RAW, BRIGHT_THRESHOLD_RAW);
     if (brightnessFactor < MIN_ON_FACTOR) brightnessFactor = 0.0f;  // too dim, turn off the backlight
-    log_d("light raw=%d smooth=%.0f factor=%.2f", rawReading,smoothedRaw, brightnessFactor);
+    log_v("light raw=%d smooth=%.0f factor=%.2f", rawReading,smoothedRaw, brightnessFactor);
 
     if (fabsf(brightnessFactor - currentBrightness) < MIN_BRIGHTNESS_STEP) return false;
     currentBrightness = brightnessFactor;
