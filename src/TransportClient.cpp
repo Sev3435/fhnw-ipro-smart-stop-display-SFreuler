@@ -100,7 +100,7 @@ Departure TransportClient::parse(const String& body) {
     for (JsonObject obj : doc["stationboard"].as<JsonArray>()) {
         const char* number = obj["number"];
         if (!number || config->line != number) {
-            log_d("skip: line '%s' != '%s'", number ? number : "(null)", config->line.c_str());
+            log_v("skip: line '%s' != '%s'", number ? number : "(null)", config->line.c_str());
             continue;
         }
 
