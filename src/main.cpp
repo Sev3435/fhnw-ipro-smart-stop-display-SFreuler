@@ -5,7 +5,6 @@
 #include "WifiManager.h"
 #include "Config.h"
 #include "LightSensor.h"
-#include "WebServer.h"
 
 Display display;
 WifiManager wifiManager;
@@ -23,7 +22,7 @@ void setup() {
     config.load();
     display.init();
     wifiManager.init();
-    webServer.begin();
+    webServer.begin(&config);
     transport.begin(&config, &display);
 }
 

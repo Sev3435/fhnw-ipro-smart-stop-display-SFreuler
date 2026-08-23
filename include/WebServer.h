@@ -1,9 +1,11 @@
 #ifndef FHNW_IPRO_SMART_STOP_DISPLAY_SFREULER_WEBSERVER_H
 #define FHNW_IPRO_SMART_STOP_DISPLAY_SFREULER_WEBSERVER_H
 
+class Config;
+
 class WebServer {
 public:
-    void begin();
+    void begin(Config* config);
 };
 
 #endif //FHNW_IPRO_SMART_STOP_DISPLAY_SFREULER_WEBSERVER_H
