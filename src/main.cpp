@@ -5,6 +5,7 @@
 #include "WifiManager.h"
 #include "Config.h"
 #include "LightSensor.h"
+#include "WebServer.h"
 
 Display display;
 WifiManager wifiManager;
