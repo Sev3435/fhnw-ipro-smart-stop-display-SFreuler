@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "LightSensor.h"
+#include "hardware/LightSensor.h"
 
 #include <cmath>
 

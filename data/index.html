@@ -39,6 +39,9 @@
     const $ = id => document.getElementById(id);
     let selected = null;
 
+    const LOCAL = new Set(["B", "T", "NFB", "NFT", "TRO", "M"]);
+    const label = (cat, num) => (!cat || LOCAL.has(cat)) ? `Line ${num}` : `${cat} ${num}`;
+
     function debounce(fn, ms) {
         let t;
         return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
@@ -92,8 +95,15 @@
             const next = pass[(idx >= 0 ? idx : 0) + 1];
             if (!next || !next.station) continue;
 
-            if (!seen.has(j.number)) {
-                seen.set(j.number, { line: j.number, nextStop: next.station.name, to: conn.to.station.name });
+            // keyed on category + number so e.g. tram 9 and IR 9 both stay in the list
+            const key = `${j.category} ${j.number}`;
+            if (!seen.has(key)) {
+                seen.set(key, {
+                    line: j.number,
+                    category: j.category || "",
+                    nextStop: next.station.name,
+                    to: conn.to.station.name
+                });
             }
         }
 
@@ -111,7 +121,7 @@
         for (const o of options) {
             const li = document.createElement("li");
             const title = document.createElement("div");
-            title.textContent = `Line ${o.line} → ${o.to}`;
+            title.textContent = `${label(o.category, o.line)} → ${o.to}`;
             const sub = document.createElement("div");
             sub.className = "muted";
             sub.textContent = `next stop: ${o.nextStop}`;
@@ -119,7 +129,7 @@
             li.onclick = () => {
                 [...lineList.children].forEach(el => el.classList.remove("selected"));
                 li.classList.add("selected");
-                selected = { stopId: Number(fromId), line: o.line, nextStop: o.nextStop };
+                selected = { stopId: Number(fromId), line: o.line, category: o.category, nextStop: o.nextStop };
                 $("save").disabled = false;
             };
             lineList.appendChild(li);
@@ -148,7 +158,8 @@
         try {
             const res = await fetch("/config");
             const c = await res.json();
-            $("current").textContent = `Currently configured: line ${c.line}, next stop ${c.nextStop}`;
+            $("current").textContent =
+                `Currently configured: ${label(c.category, c.line)}, next stop ${c.nextStop}`;
         } catch { /* opened locally, no device — fine */ }
     }
 

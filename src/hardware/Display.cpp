@@ -1,22 +1,33 @@
 #include <Wire.h>
-#include "Display.h"
+#include "hardware/Display.h"
 
 void Display::init() {
     lcd.begin(16, 2);
 
     lcd.setRGB(COLOR_R, COLOR_G, COLOR_B);
-    
+
     lcd.print("Next Departure:");
-    showDeparture("searching...");
+    showMessage("searching...");
 }
 
-void Display::showDeparture(const String& next) {
-    if (next == lastShown) return;
-    lastShown = next;
+void Display::showMessage(const String& text) {
+    if (text == lastShown) return;
+    lastShown = text;
     lcd.setCursor(0, 1);
     lcd.print("                ");
     lcd.setCursor(0, 1);
-    lcd.print(next);
+    lcd.print(text);
+}
+
+void Display::showDeparture(const String& line, int minutes) {
+    char buffer[17];
+    if (minutes < 60) {
+        snprintf(buffer, sizeof(buffer), "Line %-4s%3d min", line.c_str(), minutes);
+    } else {
+        snprintf(buffer, sizeof(buffer), "Line %-4s%dh %02dm",
+                 line.c_str(), minutes / 60, minutes % 60);
+    }
+    showMessage(buffer);
 }
 
 // TODO: extract into new class

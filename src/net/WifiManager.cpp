@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include "WifiManager.h"
+#include "net/WifiManager.h"
 #include "secrets.h"
 #include <ESPmDNS.h>
 #include "lwip/dns.h"
@@ -23,8 +23,6 @@ void WifiManager::update() {
     if (isConnected && !wasConnected) {
         log_i("connected, IP: %s", WiFi.localIP().toString().c_str());
         log_i("gw=%s dns=%s", WiFi.gatewayIP().toString().c_str(), WiFi.dnsIP().toString().c_str());
-        configTime(0, 0, "pool.ntp.org");
-        log_i("ntp sync started");
          if (MDNS.begin("smartstop")) {
              MDNS.addService("http", "tcp", 80);
              log_i("mDNS: http://smartstop.local");

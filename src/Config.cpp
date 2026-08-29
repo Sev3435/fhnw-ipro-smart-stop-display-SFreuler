@@ -5,6 +5,7 @@ void Config::load() {
     stopId = preferences.getUInt ("stopId", stopId);
     line = preferences.getString ("line", line);
     nextStop= preferences.getString ("nextStop", nextStop);
+    category = preferences.getString ("category", category);
     limit = preferences.getUChar ("limit", limit);
     refreshSec = preferences.getUInt ("refreshSec", refreshSec);
     r = preferences.getChar ("r", r);
@@ -17,6 +18,7 @@ void Config::save() {
     preferences.begin("cfg", false);
     preferences.putUInt ("stopId", stopId);
     preferences.putString ("line", line);
+    preferences.putString ("category", category);
     preferences.putString ("nextStop", nextStop);
     preferences.putUChar ("limit", limit);
     preferences.putUInt ("refreshSec", refreshSec);

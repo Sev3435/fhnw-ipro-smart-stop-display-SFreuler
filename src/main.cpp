@@ -1,15 +1,17 @@
 #include <Arduino.h>
 
-#include "TransportClient.h"
-#include "Display.h"
-#include "WifiManager.h"
 #include "Config.h"
-#include "LightSensor.h"
-#include "WebServer.h"
+#include "hardware/Display.h"
+#include "hardware/LightSensor.h"
+#include "net/WebServer.h"
+#include "net/WifiManager.h"
+#include "transport/TimeService.h"
+#include "transport/TransportClient.h"
 
 Display display;
 WifiManager wifiManager;
 Config config;
+TimeService timeService;
 TransportClient transport;
 LightSensor lightSensor;
 WebServer webServer;
@@ -24,11 +26,12 @@ void setup() {
     display.init();
     wifiManager.init();
     webServer.begin(&config);
-    transport.begin(&config, &display);
+    transport.begin(&config, &display, &timeService);
 }
 
 void loop() {
     wifiManager.update();
+    timeService.update();
     transport.update();
     if (lightSensor.update()) {
         display.setBrightness(lightSensor.brightness());

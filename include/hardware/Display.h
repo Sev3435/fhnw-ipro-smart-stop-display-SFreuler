@@ -1,13 +1,15 @@
 #ifndef FHNW_IPRO_SMART_STOP_DISPLAY_SFREULER_DISPLAY_H
 #define FHNW_IPRO_SMART_STOP_DISPLAY_SFREULER_DISPLAY_H
 
+#include <Arduino.h>
 #include <rgb_lcd.h>
 #include <cstdint>
 
 class Display {
     public:
         void init();
-        void showDeparture(const String& s);
+        void showMessage(const String& text);
+        void showDeparture(const String& line, int minutes);
         void update();
         void setBrightness(float factor);
     private:
@@ -20,4 +22,3 @@ class Display {
 };
 
 #endif //FHNW_IPRO_SMART_STOP_DISPLAY_SFREULER_DISPLAY_H
-

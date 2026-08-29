@@ -9,6 +9,7 @@ class Config {
     public:
         uint32_t stopId     = 8576646;
         String line = "10";
+        String category = "";
         String nextStop = "Bern, Bundesplatz";
         uint8_t  limit      = 30;
         uint32_t refreshSec = 30;
