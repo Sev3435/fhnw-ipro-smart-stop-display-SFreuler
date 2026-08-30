@@ -7,6 +7,7 @@
 #include "net/WifiManager.h"
 #include "transport/TimeService.h"
 #include "transport/TransportClient.h"
+#include "net/ConfigRoutes.h"
 
 Display display;
 WifiManager wifiManager;
@@ -24,7 +25,10 @@ void setup() {
     log_i("boot");
     config.load();
     display.init();
-    wifiManager.init();
+    if (webServer.mount()) {
+        ConfigRoutes::attach(webServer.http(), &config);
+        webServer.start();
+    }
     webServer.begin(&config);
     transport.begin(&config, &display, &timeService);
 }
