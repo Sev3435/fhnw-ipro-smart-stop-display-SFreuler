@@ -10,6 +10,7 @@
 #include "net/ConfigRoutes.h"
 #include "net/WifiStore.h"
 #include "net/Provisioner.h"
+#include "net/WifiRoutes.h"
 
 Display display;
 WifiManager wifiManager;
@@ -54,9 +55,18 @@ void setup() {
     }
     wifiManager.begin(&wifiStore);
     transport.begin(&config, &display, &timeService);
+    if (webServer.mount()) {
+        ConfigRoutes::attach(webServer.http(), &config);
+        WifiRoutes::attach(webServer.http(), &wifiStore);
+        webServer.start();
+    }
 }
 
 void loop() {
+    if (WifiRoutes::restartPending()) {
+        delay(500);          // let the response flush
+        ESP.restart();
+    }
 
     if (mode == NetworkMode::Provisioning) return;
 
