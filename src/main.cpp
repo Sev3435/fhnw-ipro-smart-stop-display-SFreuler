@@ -26,13 +26,14 @@ void setup() {
     config.load();
     display.init();
 
+    wifi.begin(&display);
+
     if (webServer.mount()) {
         ConfigRoutes::attach(webServer.http(), &config);
         wifi.attachRoutes(webServer.http());
         webServer.start();
     }
 
-    wifi.begin(&display);
     transport.begin(&config, &display, &timeService);
 }
 
