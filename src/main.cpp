@@ -3,35 +3,19 @@
 #include "Config.h"
 #include "hardware/Display.h"
 #include "hardware/LightSensor.h"
+#include "net/ConfigRoutes.h"
 #include "net/WebServer.h"
-#include "net/WifiManager.h"
+#include "net/WifiService.h"
 #include "transport/TimeService.h"
 #include "transport/TransportClient.h"
-#include "net/ConfigRoutes.h"
-#include "net/WifiStore.h"
-#include "net/Provisioner.h"
-#include "net/WifiRoutes.h"
 
 Display display;
-WifiManager wifiManager;
 Config config;
+WifiService wifi;
 TimeService timeService;
 TransportClient transport;
 LightSensor lightSensor;
 WebServer webServer;
-WifiStore wifiStore;
-Provisioner provisioner;
-
-enum class NetworkMode { Provisioning, Normal };
-static NetworkMode mode = NetworkMode::Normal;
-
-
-static void enterProvisioning() {
-    mode = NetworkMode::Provisioning;
-    provisioner.begin();
-    display.showTitle("WiFi setup:");
-    display.showMessage(provisioner.apIp());
-}
 
 void setup() {
     Serial.begin(115200);
@@ -41,42 +25,21 @@ void setup() {
     log_i("boot");
     config.load();
     display.init();
+
     if (webServer.mount()) {
         ConfigRoutes::attach(webServer.http(), &config);
+        wifi.attachRoutes(webServer.http());
         webServer.start();
     }
-    wifiStore.load();
-    if (wifiStore.hasCredentials()) {
-        wifiManager.begin(&wifiStore);
-        transport.begin(&config, &display, &timeService);
-    } else {
-        log_w("no credentials stored");
-        enterProvisioning();
-    }
-    wifiManager.begin(&wifiStore);
+
+    wifi.begin(&display);
     transport.begin(&config, &display, &timeService);
-    if (webServer.mount()) {
-        ConfigRoutes::attach(webServer.http(), &config);
-        WifiRoutes::attach(webServer.http(), &wifiStore);
-        webServer.start();
-    }
 }
 
 void loop() {
-    if (WifiRoutes::restartPending()) {
-        delay(500);          // let the response flush
-        ESP.restart();
-    }
+    wifi.update();
+    if (wifi.isProvisioning()) return;
 
-    if (mode == NetworkMode::Provisioning) return;
-
-    if (wifiManager.update() == WifiManager::Status::GaveUp) {
-        log_w("could not connect, falling back to setup AP");
-        wifiManager.end();
-        enterProvisioning();
-        return;
-    }
-    wifiManager.update();
     timeService.update();
     transport.update();
     if (lightSensor.update()) {

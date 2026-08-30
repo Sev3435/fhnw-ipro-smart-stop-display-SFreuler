@@ -47,7 +47,6 @@ WifiManager::Status WifiManager::update() {
         WiFi.mode(WIFI_OFF);
         WiFi.mode(WIFI_STA);
         connect();
-        connect();
     }
 
     wasConnected = isConnected;
