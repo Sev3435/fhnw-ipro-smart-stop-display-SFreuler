@@ -1,11 +1,12 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include "net/WifiManager.h"
-#include "secrets.h"
+#include "net/WifiStore.h"
 #include <ESPmDNS.h>
 #include "lwip/dns.h"
 
-void WifiManager::init() {
+void WifiManager::begin(WifiStore* store) {
+    this->store = store;
     WiFi.mode(WIFI_STA);
     WiFi.setAutoReconnect(false);
     WiFi.setSleep(false);
@@ -13,7 +14,11 @@ void WifiManager::init() {
     WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info) {
         log_w("disconnect reason=%d", info.wifi_sta_disconnected.reason);
     }, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
+    connect();
+}
+
+void WifiManager::connect() {
+    WiFi.begin(store->ssid.c_str(), store->pass.c_str());
     lastAttemptMs = millis();
 }
 
@@ -35,13 +40,12 @@ void WifiManager::update() {
         lastAttemptMs = millis();
     }
 
-    // plain reconnect doesn't always recover, so tear the whole thing down and start over
     if (!isConnected && millis() - lastAttemptMs >= RETRY_INTERVAL_MS) {
         log_d("retry: full re-begin");
         WiFi.disconnect(true, true);
         WiFi.mode(WIFI_OFF);
         WiFi.mode(WIFI_STA);
-        WiFi.begin(WIFI_SSID, WIFI_PASS);
+        connect();
         lastAttemptMs = millis();
     }
 

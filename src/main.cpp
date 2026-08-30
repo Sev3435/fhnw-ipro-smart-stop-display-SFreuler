@@ -8,6 +8,8 @@
 #include "transport/TimeService.h"
 #include "transport/TransportClient.h"
 #include "net/ConfigRoutes.h"
+#include "secrets.h"
+#include "net/WifiStore.h"
 
 Display display;
 WifiManager wifiManager;
@@ -16,6 +18,7 @@ TimeService timeService;
 TransportClient transport;
 LightSensor lightSensor;
 WebServer webServer;
+WifiStore wifiStore;
 
 void setup() {
     Serial.begin(115200);
@@ -29,7 +32,13 @@ void setup() {
         ConfigRoutes::attach(webServer.http(), &config);
         webServer.start();
     }
-    webServer.begin(&config);
+    wifiStore.load();
+    if (!wifiStore.hasCredentials()) {      // scaffolding, removed next commit
+        wifiStore.ssid = WIFI_SSID;
+        wifiStore.pass = WIFI_PASS;
+        wifiStore.save();
+    }
+    wifiManager.begin(&wifiStore);
     transport.begin(&config, &display, &timeService);
 }
 
