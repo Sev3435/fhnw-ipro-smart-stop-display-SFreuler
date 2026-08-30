@@ -44,3 +44,10 @@ void Display::setBrightness(float factor) {
         lcd.setRGB(COLOR_R * perceptual, COLOR_G * perceptual, COLOR_B * perceptual);
     }
 }
+
+void Display::showTitle(const String& text) {
+    lcd.setCursor(0, 0);
+    lcd.print("                ");
+    lcd.setCursor(0, 0);
+    lcd.print(text);
+}

@@ -12,6 +12,7 @@ class Display {
         void showDeparture(const String& line, int minutes);
         void update();
         void setBrightness(float factor);
+        void showTitle(const String& text);
     private:
         rgb_lcd lcd;
         uint32_t lastRefreshMs = 0;

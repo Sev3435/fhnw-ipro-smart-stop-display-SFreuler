@@ -6,6 +6,7 @@
 #include "lwip/dns.h"
 
 void WifiManager::begin(WifiStore* store) {
+    startedMs = millis();
     this->store = store;
     WiFi.mode(WIFI_STA);
     WiFi.setAutoReconnect(false);
@@ -22,17 +23,17 @@ void WifiManager::connect() {
     lastAttemptMs = millis();
 }
 
-void WifiManager::update() {
+WifiManager::Status WifiManager::update() {
     bool isConnected = (WiFi.status() == WL_CONNECTED);
 
     if (isConnected && !wasConnected) {
+        everConnected = true;
         log_i("connected, IP: %s", WiFi.localIP().toString().c_str());
         log_i("gw=%s dns=%s", WiFi.gatewayIP().toString().c_str(), WiFi.dnsIP().toString().c_str());
-         if (MDNS.begin("smartstop")) {
-             MDNS.addService("http", "tcp", 80);
-             log_i("mDNS: http://smartstop.local");
-         } else {
-             log_e("mDNS start failed");
+        if (!mdnsStarted && MDNS.begin("smartstop")) {
+            MDNS.addService("http", "tcp", 80);
+            mdnsStarted = true;
+            log_i("mDNS: http://smartstop.local");
         }
     }
     if (!isConnected && wasConnected) {
@@ -46,8 +47,22 @@ void WifiManager::update() {
         WiFi.mode(WIFI_OFF);
         WiFi.mode(WIFI_STA);
         connect();
-        lastAttemptMs = millis();
+        connect();
     }
 
     wasConnected = isConnected;
+
+    if (isConnected) return Status::Connected;
+    if (!everConnected && millis() - startedMs >= GIVE_UP_MS) return Status::GaveUp;
+    return Status::Connecting;
+}
+
+void WifiManager::end() {
+    if (mdnsStarted) {
+        MDNS.end();
+        mdnsStarted = false;
+    }
+    WiFi.disconnect(true, true);
+    WiFi.mode(WIFI_OFF);
+    wasConnected = false;
 }

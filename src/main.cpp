@@ -8,8 +8,8 @@
 #include "transport/TimeService.h"
 #include "transport/TransportClient.h"
 #include "net/ConfigRoutes.h"
-#include "secrets.h"
 #include "net/WifiStore.h"
+#include "net/Provisioner.h"
 
 Display display;
 WifiManager wifiManager;
@@ -19,6 +19,18 @@ TransportClient transport;
 LightSensor lightSensor;
 WebServer webServer;
 WifiStore wifiStore;
+Provisioner provisioner;
+
+enum class NetworkMode { Provisioning, Normal };
+static NetworkMode mode = NetworkMode::Normal;
+
+
+static void enterProvisioning() {
+    mode = NetworkMode::Provisioning;
+    provisioner.begin();
+    display.showTitle("WiFi setup:");
+    display.showMessage(provisioner.apIp());
+}
 
 void setup() {
     Serial.begin(115200);
@@ -33,16 +45,27 @@ void setup() {
         webServer.start();
     }
     wifiStore.load();
-    if (!wifiStore.hasCredentials()) {      // scaffolding, removed next commit
-        wifiStore.ssid = WIFI_SSID;
-        wifiStore.pass = WIFI_PASS;
-        wifiStore.save();
+    if (wifiStore.hasCredentials()) {
+        wifiManager.begin(&wifiStore);
+        transport.begin(&config, &display, &timeService);
+    } else {
+        log_w("no credentials stored");
+        enterProvisioning();
     }
     wifiManager.begin(&wifiStore);
     transport.begin(&config, &display, &timeService);
 }
 
 void loop() {
+
+    if (mode == NetworkMode::Provisioning) return;
+
+    if (wifiManager.update() == WifiManager::Status::GaveUp) {
+        log_w("could not connect, falling back to setup AP");
+        wifiManager.end();
+        enterProvisioning();
+        return;
+    }
     wifiManager.update();
     timeService.update();
     transport.update();
