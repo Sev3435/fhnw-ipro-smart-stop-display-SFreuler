@@ -211,10 +211,6 @@ Unless noted otherwise.
 * Source code examples in this repository are declared Public Domain [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)
 * Content by [A. Kennel](https://www.fhnw.ch/de/personen/andrea-kennel), [G. Deck](https://www.fhnw.ch/en/people/klaus-georg-deck), [T. Amberg](https://www.fhnw.ch/en/people/thomas-amberg), FHNW is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
-Publishing your own code?
-
-* [Choose an open source license](https://choosealicense.com/), e.g. the simple [MIT License](https://choosealicense.com/licenses/mit/)
-
 [transport.opendata.ch]: https://transport.opendata.ch
 [Unexpected Maker FeatherS3]: https://esp32s3.com/feathers3.html
 [PlatformIO]: https://platformio.org
