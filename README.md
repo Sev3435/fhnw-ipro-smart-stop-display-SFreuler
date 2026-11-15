@@ -165,17 +165,21 @@ Firmware: C++ (Arduino framework, PlatformIO). Web UI: HTML and JavaScript in
 | `src/`, `include/` | firmware sources |
 | `data/` | web UI uploaded to LittleFS |
 | `docs/` | architecture, technical documentation, user manual, worklog |
-| `tools/postman/` | API collection and environments |
+| `tools/postman/` | Postman collection for the device API |
 | `tools/SerialDisplay/`, `tools/WifiScan/` | standalone Arduino sketches used while prototyping |
-| `test/` | unit tests (empty for now) |
 
 ## Documentation
 
-- [Technische Dokumentation](docs/Technische%20Dokumentation.docx)
-- [Benutzeranleitung](docs/Benutzeranleitung.docx)
-- [WifiQRCodes](docs/WifiQRCodes.docx)
+All documents are in German.
+
+- [Technische Dokumentation](docs/Technische%20Dokumentation.pdf) (technical documentation)
+- [Benutzeranleitung](docs/Benutzeranleitung.pdf) (user manual)
+- [Elevator pitch](docs/ElevatorPitch.pdf)
+- [Project proposal](docs/Formular_Eigene_Idee.pdf)
+- [Wi-Fi QR codes](docs/WifiQRCodes.pdf)
 - [Worklog](docs/Worklog.md)
 - [Gantt chart](docs/Gantt%20chart.xlsx)
+- Reference: [I2C LCD with ESP32 (Random Nerd Tutorials)](https://randomnerdtutorials.com/esp32-esp8266-i2c-lcd-arduino-ide/)
 
 ## Troubleshooting
 
@@ -195,14 +199,11 @@ Firmware: C++ (Arduino framework, PlatformIO). Web UI: HTML and JavaScript in
 - `limit`, `refreshSec` and the backlight colour are persisted but cannot be
   changed over HTTP
 - the setup access point uses a fixed, published password
-- `test/` contains no tests
+- there are no unit tests yet
 
 ## AI tools
 
-https://chatgpt.com/g/g-p-69754f194c0081919a00ac923cd94c22-ipro/project
-
-For the best experience, download the folder and open `index.html`.
-https://fhnw365-my.sharepoint.com/:u:/g/personal/severin_freuler_students_fhnw_ch/IQACLKwxPYbnTIkFcKB1bjOOAT2-3-1lxSWNpBZK8iGR-7Q?e=1JEjro
+ChatGPT was used as an assistant during development.
 
 
 ## License
