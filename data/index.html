@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stop Display Config</title>
+<link rel="stylesheet" href="style.css">
+
+<main>
+    <h1>Smart Stop Display</h1>
+    <p id="current" class="muted"></p>
+
+    <section class="card">
+        <div class="fields">
+            <div class="field">
+                <label for="from">From</label>
+                <input id="from" autocomplete="off" placeholder="Departure stop…">
+                <ul id="fromList" class="suggest"></ul>
+            </div>
+            <div class="field">
+                <label for="to">To</label>
+                <input id="to" autocomplete="off" placeholder="Destination…">
+                <ul id="toList" class="suggest"></ul>
+            </div>
+        </div>
+        <button id="find">Find direct lines</button>
+    </section>
+
+    <section class="card hidden" id="linesCard">
+        <h2>Choose your line</h2>
+        <ul id="lineList" class="options"></ul>
+        <button id="save" disabled>Save to display</button>
+    </section>
+
+    <p id="status"></p>
+</main>
+
+<script>
+    const api = "https://transport.opendata.ch/v1";
+    const $ = id => document.getElementById(id);
+    let selected = null;
+
+    const LOCAL = new Set(["B", "T", "NFB", "NFT", "TRO", "M"]);
+    const label = (cat, num) => (!cat || LOCAL.has(cat)) ? `Line ${num}` : `${cat} ${num}`;
+
+    function debounce(fn, ms) {
+        let t;
+        return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+    }
+
+    function attachAutocomplete(input, list) {
+        async function search(query) {
+            if (query.length < 2) { list.innerHTML = ""; return; }
+            const res = await fetch(`${api}/locations?query=${encodeURIComponent(query)}&type=station`);
+            const data = await res.json();
+            list.innerHTML = "";
+            for (const s of data.stations) {
+                if (!s.id) continue;
+                const li = document.createElement("li");
+                li.textContent = s.name;
+                li.onclick = () => {
+                    input.value = s.name;
+                    input.dataset.id = s.id;
+                    list.innerHTML = "";
+                };
+                list.appendChild(li);
+            }
+        }
+        input.addEventListener("input", debounce(e => {
+            delete input.dataset.id;
+            search(e.target.value);
+        }, 250));
+    }
+
+    attachAutocomplete($("from"), $("fromList"));
+    attachAutocomplete($("to"),   $("toList"));
+
+    async function findLines() {
+        const fromId = $("from").dataset.id;
+        const toId   = $("to").dataset.id;
+        if (!fromId || !toId) { setStatus("Pick both stops from the suggestions first."); return; }
+
+        setStatus("Searching…");
+        const res  = await fetch(`${api}/connections?from=${fromId}&to=${toId}&direct=1&limit=16`);
+        const data = await res.json();
+
+        const seen = new Map();
+        for (const conn of data.connections) {
+            const section = conn.sections.find(s => s.journey);
+            if (!section) continue;
+            const j = section.journey;
+            if (!j.number) continue;
+
+            const pass = j.passList || [];
+            const idx  = pass.findIndex(p => p.station && String(p.station.id) === String(fromId));
+            const next = pass[(idx >= 0 ? idx : 0) + 1];
+            if (!next || !next.station) continue;
+
+            // keyed on category + number so e.g. tram 9 and IR 9 both stay in the list
+            const key = `${j.category} ${j.number}`;
+            if (!seen.has(key)) {
+                seen.set(key, {
+                    line: j.number,
+                    category: j.category || "",
+                    nextStop: next.station.name,
+                    to: conn.to.station.name
+                });
+            }
+        }
+
+        const options = [...seen.values()];
+        setStatus(options.length ? "" : "No direct line found between these stops.");
+        renderLines(fromId, options);
+    }
+
+    function renderLines(fromId, options) {
+        const lineList = $("lineList");
+        lineList.innerHTML = "";
+        selected = null;
+        $("save").disabled = true;
+
+        for (const o of options) {
+            const li = document.createElement("li");
+            const title = document.createElement("div");
+            title.textContent = `${label(o.category, o.line)} → ${o.to}`;
+            const sub = document.createElement("div");
+            sub.className = "muted";
+            sub.textContent = `next stop: ${o.nextStop}`;
+            li.append(title, sub);
+            li.onclick = () => {
+                [...lineList.children].forEach(el => el.classList.remove("selected"));
+                li.classList.add("selected");
+                selected = { stopId: Number(fromId), line: o.line, category: o.category, nextStop: o.nextStop };
+                $("save").disabled = false;
+            };
+            lineList.appendChild(li);
+        }
+        $("linesCard").classList.toggle("hidden", options.length === 0);
+    }
+
+    async function saveConfig() {
+        if (!selected) return;
+        setStatus("Saving…");
+        try {
+            const res = await fetch("/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(selected)
+            });
+            if (!res.ok) throw new Error(res.status);
+            setStatus("✓ Saved — the display picks it up on its next refresh.");
+            loadCurrent();
+        } catch {
+            setStatus("Save failed — this only works when the page is opened from the display itself.");
+        }
+    }
+
+    async function loadCurrent() {
+        try {
+            const res = await fetch("/config");
+            const c = await res.json();
+            $("current").textContent =
+                `Currently configured: ${label(c.category, c.line)}, next stop ${c.nextStop}`;
+        } catch { /* opened locally, no device — fine */ }
+    }
+
+    function setStatus(msg) { $("status").textContent = msg; }
+
+    $("find").addEventListener("click", findLines);
+    $("save").addEventListener("click", saveConfig);
+    loadCurrent();
+</script>

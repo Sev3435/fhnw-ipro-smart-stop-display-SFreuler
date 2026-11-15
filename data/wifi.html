@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stop Display Wi-Fi Setup</title>
+<link rel="stylesheet" href="style.css">
+
+<main>
+    <h1>Connect the display</h1>
+    <p class="muted">Enter your home network so the display can reach the internet.</p>
+
+    <section class="card">
+        <div class="fields">
+            <div class="field">
+                <label for="ssid">Network name</label>
+                <input id="ssid" autocomplete="off" placeholder="Your Wi-Fi SSID…">
+            </div>
+            <div class="field">
+                <label for="pass">Password</label>
+                <input id="pass" type="password" autocomplete="off">
+            </div>
+        </div>
+        <button id="save">Save and restart</button>
+    </section>
+
+    <p id="status"></p>
+</main>
+
+<script>
+    const $ = id => document.getElementById(id);
+    const setStatus = msg => $("status").textContent = msg;
+
+    async function save() {
+        const ssid = $("ssid").value.trim();
+        if (!ssid) { setStatus("Enter your network name first."); return; }
+        setStatus("Saving…");
+        try {
+            const res = await fetch("/wifi", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ssid, pass: $("pass").value })
+            });
+            if (!res.ok) throw new Error(res.status);
+            setStatus("✓ Saved — the display is restarting and will join your network.");
+        } catch {
+            setStatus("Save failed.");
+        }
+    }
+
+    $("save").addEventListener("click", save);
+</script>
