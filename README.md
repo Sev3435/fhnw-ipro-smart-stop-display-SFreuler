@@ -5,8 +5,7 @@ FHNW (ipro) is a mandatory individual software project, worth 6 ECTS.
 An ESP32 shows the next departure of one public transport line on a 16x2 RGB
 LCD. It pulls live data from the Swiss [transport.opendata.ch] API, keeps time
 over NTP, and dims its backlight with an ambient light sensor. Wi-Fi and the
-stop/line to watch are configured from a browser — no re-flashing, no
-credentials in source.
+stop/line to watch are configured from a browser.
 
 ![The display in operation](docs/20260112_124451.jpg)
 
@@ -17,7 +16,7 @@ credentials in source.
 - Browser-based Wi-Fi provisioning: the display opens its own setup access
   point when it has no credentials or cannot connect
 - Browser-based line picker: search a departure stop and destination, pick from
-  the direct lines that actually run between them
+  the direct lines that run between them
 - Settings survive a power cycle (stored in NVS)
 - Ambient-light-controlled backlight brightness
 - Reachable at `http://smartstop.local` via mDNS once on the network
@@ -49,9 +48,9 @@ Requires [PlatformIO] (CLI, or the CLion / VS Code plugin).
 pio run -e esp32devkit -t upload
 ```
 
-The web UI lives in `data/` and is served from a LittleFS partition, so it has
-to be uploaded separately — **once, and again after every change under
-`data/`**:
+The web UI is in `data/` and is served from a LittleFS partition, so it has
+to be uploaded separately. Do this once, and again after every change under
+`data/`:
 
 ```bash
 pio run -e esp32devkit -t uploadfs
@@ -68,7 +67,7 @@ pio device monitor
 | Environment | Board | Log level |
 | --- | --- | --- |
 | `esp32devkit` | `esp32doit-devkit-v1` | verbose (`CORE_DEBUG_LEVEL=4`) |
-| `esp32devkit_release` | `esp32doit-devkit-v1` | silent (`CORE_DEBUG_LEVEL=0`) — deployment build |
+| `esp32devkit_release` | `esp32doit-devkit-v1` | silent (`CORE_DEBUG_LEVEL=0`), deployment build |
 | `um_feathers3` | `um_feathers3` | info (`CORE_DEBUG_LEVEL=3`) |
 
 `platformio.ini` pins `upload_port` and `monitor_port` to `COM8`. Change both
@@ -107,7 +106,7 @@ Served by the device on port 80.
 | `POST` | `/wifi` | `{"ssid":"…","pass":"…"}` | store Wi-Fi credentials, then reboot |
 | `POST` | `/forget` | — | clear Wi-Fi credentials, then reboot into setup mode |
 
-Ready-made requests live in `tools/postman/`.
+Ready-made requests are in `tools/postman/`.
 
 ## Configuration
 
@@ -119,7 +118,7 @@ in NVS.
 | `stopId` | `8576646` | opendata.ch station id of the departure stop |
 | `line` | `10` | line number to watch |
 | `category` | `""` | vehicle category (`T`, `B`, `IR`, …); empty matches any |
-| `nextStop` | `Bern, Bundesplatz` | the stop *after* yours — this is what selects the direction |
+| `nextStop` | `Bern, Bundesplatz` | the stop *after* yours; it selects the direction |
 | `limit` | `30` | departures requested per API call |
 | `refreshSec` | `30` | seconds between API calls |
 | `r`, `g`, `b` | `64, 224, 208` | LCD backlight colour |
@@ -133,9 +132,9 @@ main.cpp            wiring and the super-loop
 ├── Config          persisted settings (NVS "cfg")
 ├── hardware/
 │   ├── Display     16x2 RGB LCD, text formatting and brightness
-│   └── LightSensor smoothed LDR reading → 0..1 brightness factor
+│   └── LightSensor smoothed LDR reading -> 0..1 brightness factor
 ├── net/
-│   ├── WifiService lifecycle: normal ↔ provisioning mode
+│   ├── WifiService lifecycle: normal <-> provisioning mode
 │   │   ├── WifiStore    credentials in NVS ("wifi")
 │   │   ├── WifiManager  connect, retry, give up, mDNS
 │   │   └── Provisioner  setup access point
@@ -144,19 +143,20 @@ main.cpp            wiring and the super-loop
 │   └── WifiRoutes   /wifi, /forget
 └── transport/
     ├── TransportApi     HTTP GET against the stationboard endpoint
-    ├── DepartureParser  JSON → the first matching Departure
-    ├── TimeService      NTP sync and ISO-8601 → minutes remaining
+    ├── DepartureParser  JSON -> the first matching Departure
+    ├── TimeService      NTP sync and ISO-8601 -> minutes remaining
     └── TransportClient  refresh loop tying the three together
 ```
 
-Route modules are registered before the static-file catch-all, and a reboot
-requested from an HTTP handler is deferred to the main loop rather than taken
-inside the handler.
+Route modules are registered before the static-file catch-all. A reboot requested from an HTTP
+handler is deferred to the main loop.
 
 See [docs/IPRO_Architecture.svg](docs/IPRO_Architecture.svg) for the diagram.
 
-## Components and Language
-https://esp32s3.com/feathers3.html
+## Components and language
+
+Firmware: C++ (Arduino framework, PlatformIO). Web UI: HTML and JavaScript in
+`data/`. Hardware: see [Hardware](#hardware).
 
 ## Repository layout
 
@@ -181,10 +181,10 @@ https://esp32s3.com/feathers3.html
 
 | Symptom | Cause |
 | --- | --- |
-| LCD stuck on `searching...` | no Wi-Fi, or NTP has not synced yet — the countdown needs real time |
+| LCD stuck on `searching...` | no Wi-Fi, or NTP has not synced yet (the countdown needs real time) |
 | Browser shows nothing on port 80 | the LittleFS image was never uploaded (`pio run -t uploadfs`) |
 | `smartstop.local` does not resolve | mDNS unavailable on your network; use the IP from the serial log |
-| Wrong direction shown | `nextStop` selects the direction — re-pick the line in the web UI |
+| Wrong direction shown | `nextStop` selects the direction; re-pick the line in the web UI |
 | Back on `SmartStop-Setup` after a reboot | the stored network was unreachable for 30 s |
 
 
@@ -201,7 +201,7 @@ https://esp32s3.com/feathers3.html
 
 https://chatgpt.com/g/g-p-69754f194c0081919a00ac923cd94c22-ipro/project
 
-For the best experience: Download the folder and navigate the files by opening idnex.html
+For the best experience, download the folder and open `index.html`.
 https://fhnw365-my.sharepoint.com/:u:/g/personal/severin_freuler_students_fhnw_ch/IQACLKwxPYbnTIkFcKB1bjOOAT2-3-1lxSWNpBZK8iGR-7Q?e=1JEjro
 
 
@@ -214,3 +214,7 @@ Unless noted otherwise.
 Publishing your own code?
 
 * [Choose an open source license](https://choosealicense.com/), e.g. the simple [MIT License](https://choosealicense.com/licenses/mit/)
+
+[transport.opendata.ch]: https://transport.opendata.ch
+[Unexpected Maker FeatherS3]: https://esp32s3.com/feathers3.html
+[PlatformIO]: https://platformio.org
